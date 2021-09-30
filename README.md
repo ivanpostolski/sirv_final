@@ -1,7 +1,7 @@
-# Trabajo Practico final de la materia Simulacion de Eventos Discretos 
+# Trabajo Práctico final de la materia Simulación de Eventos Discretos 
 ## "Comparando Estrategias de Vacunacion con EB-DEVS"
 
-En este repositorio se encuentra el código desarrollado durante el trabajo, el reporte final y un video de los resultados mencionados en el mismo. 
+En este repositorio se encuentra el código desarrollado, el reporte y videos de las simulaciones mencionados en el mismo, para el trabajo final de la materia [Simulación de Eventos Discretos](https://modsimu.exp.dc.uba.ar/sed/index.php) de la Universidad de Buenos Aires.
 
 Dado que la cantidad de simulaciones realizadas durante la evaluacion son más de 7 mil, con 20 reintentos para promediar cada una, realizamos un script que ejecuta cada configuración por separado, así es posible reproducir algún comportamiento de interés y/o facilitar la extensión del trabajo con otras estrategias de vacunación y/o distribuciones de grado. 
 
