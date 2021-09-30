@@ -40,6 +40,18 @@ En el código por defecto se encuentran las siguientes estrategias, distribucion
 | `vaccine_factors_100_25` | ejecuta la simulacion con 100 factores de escala linealmente espaciados entre [0.001,0.5], sin límite de vacunas disponibles en 25% de la población |
 | `vaccine_factors_100_50` | ejecuta la simulacion con 100 factores de escala linealmente espaciados entre [0.001,0.5], sin límite de vacunas disponibles en 50% de la población |
 
+### Detalle de Archivos Relevantes
+
+--`experiment.py` contiene la api para correr experimentos
+
+-- `model.py`  contiene el modelo EB-DEVS desarrollado para simular las distintas estrategias de vacunación
+
+-- `vaccination_strategies.py` estrategias de vacunación propuestas y distribuciones de grado
+
+-- `TP.pdf` reporte general del trabajo, con detalle sobre la motivación, y los hallazgos obtenidos a partir de las simulaciones 
+
+-- `results-videos.zip` los resultados de las simulaciones en videos .mp4 
+
 
 ### Resultados
 Cada simulación produce sus resultados dentro de la carpeta `results/` en un archivo .png que sigue el siguiente formato:
