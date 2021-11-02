@@ -179,6 +179,7 @@ distributions = [bimodal]
 # distributions = [bimodal] 
 
 vaccine_factors = [default_vaccine_props] 
+threshold_factors = [threshold_vaccine_props]
 vaccine_factors_all = [{"name":"s=%.3f_limit=inf" % scale, "vaccine_scale": scale, "vaccine_limit": INFINITY } for scale in [0.001,0.005,0.010,0.050,0.100,0.200,0.300,0.400]]
 
 vaccine_factors_100 = [{"name":"s=%.3f_limit=inf" % scale, "vaccine_scale": scale, "vaccine_limit": INFINITY } for scale in np.linspace(0.001,0.5,100)]
@@ -196,8 +197,38 @@ def run_strategy_experiments():
 
     for vaccine_strategy in strategies:
         for dist_gen in distributions:
-            for vaccine_props in vaccine_factors_100_25:
+            for vaccine_props in threshold_factors:
                 run_experiments(vaccine_strategy,dist_gen,vaccine_props)
+
+
+def calculate_cost(simulation_data,vaccine_props):
+    costs = []
+    for retry_i in set(simulation_data['retry']):
+        data_retry_i = simulation_data.loc[simulation_data['retry'] == retry_i]
+        times_i = data_retry_i['t']
+        times_i.reset_index(inplace = True, drop = True)
+        S_i = data_retry_i['S'] 
+        I_i = data_retry_i['I']
+        costs.append(calculate_retry_cost(times_i,S_i,I_i,vaccine_props))
+    return sum(costs)/float(len(costs))
+
+from scipy.integrate import quad
+from scipy import interpolate
+from scipy.interpolate import interp1d
+
+def calculate_retry_cost(times_i,S_i,I_i,vaccine_props):
+    u=np.zeros(201)
+    for i in range(201):
+        if times_i[i] <= vaccine_props["threshold"]: 
+            u[i] = vaccine_props["vaccine_scale"]
+    
+    tiempo_modelo=np.arange(0,10.05,0.05)
+    interpI = interp1d(tiempo_modelo, I_i)
+    interpu=interp1d(tiempo_modelo, u)
+    interpS=interp1d(tiempo_modelo,S_i)
+    C=lambda t: vaccine_props["cV"]*interpu(t)*interpS(t)+vaccine_props["cI"]*interpI(t)
+    return quad(C,0,10,limit=1000)[0]
+
 
 def run_experiments(vaccine_strategy,dist_gen,vaccine_props):
 
@@ -227,21 +258,30 @@ def run_experiments(vaccine_strategy,dist_gen,vaccine_props):
 
     plt.tight_layout()
     plt.savefig('results/%s_%s_%s.png' %(dist_gen["name"],vaccine_strategy["name"],vaccine_props["name"]), bbox_inches='tight')
+    simulation_data = pd.read_csv('paraNumeric.csv')
+    write_cost('results/%s_%s_%s.output.txt' %(dist_gen["name"],vaccine_strategy["name"],vaccine_props["name"]),calculate_cost(simulation_data,vaccine_props))
 
-# run_strategy_experiments()
+def write_cost(output_file,avg_cost):
+    f = open(output_file, "w")
+    f.write("%s" % str(avg_cost))
+    f.close()
+    return 
+
+
+run_strategy_experiments()
 
 import sys
 import os
 
-if __name__ == '__main__':
-    print("Simulating with parameters")
-    vaccine_strategy = eval(sys.argv[1])
-    print("strategy: %s" % str(vaccine_strategy["name"]))
-    vaccine_factors = eval(sys.argv[3])
-    dist = eval(sys.argv[2])
-    print("distribution: %s" % str(dist["name"]))
-    for vaccine_props in vaccine_factors:     
-        print("props: %s" % str(vaccine_props))
-        if os.path.exists('results/%s_%s_%s.png' %(dist["name"],vaccine_strategy["name"],vaccine_props["name"])):
-            continue
-        run_experiments(vaccine_strategy,dist,vaccine_props)
+# if __name__ == '__main__':
+#     print("Simulating with parameters")
+#     vaccine_strategy = eval(sys.argv[1])
+#     print("strategy: %s" % str(vaccine_strategy["name"]))
+#     vaccine_factors = eval(sys.argv[3])
+#     dist = eval(sys.argv[2])
+#     print("distribution: %s" % str(dist["name"]))
+#     for vaccine_props in vaccine_factors:     
+#         print("props: %s" % str(vaccine_props))
+#         if os.path.exists('results/%s_%s_%s.png' %(dist["name"],vaccine_strategy["name"],vaccine_props["name"])):
+#             continue
+#         run_experiments(vaccine_strategy,dist,vaccine_props)

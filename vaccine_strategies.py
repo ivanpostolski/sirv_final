@@ -14,6 +14,15 @@ def default_strategy_fun(agent,env,props):
 default_strategy = {"name": "default_strategy", "fun": default_strategy_fun}
 
 
+def square_strategy_fun(agent,env,props):
+    if agent.deg == 0:
+        return INFINITY
+    else:
+        return np.random.exponential(float(1)/(float(props.PHI)*env.vaccine_scale))
+
+square_strategy = {"name": "default_strategy", "fun": default_strategy_fun}
+
+
 def double_default_strategy_fun(agent,env,props):
     if agent.deg == 0:
         return INFINITY
@@ -90,3 +99,5 @@ regular_5 = {"generator":lambda x: 5, "mean": 5.0 ,"name": "regular_5"}
 
 
 default_vaccine_props = {"name":"s=0.05_limit=inf", "vaccine_scale": 0.05, "vaccine_limit": INFINITY } 
+
+threshold_vaccine_props = {"name":"s=0.05_limit=inf", "vaccine_scale": 0.05, "vaccine_limit": INFINITY, "threshold":5.0,"cV":5.0, "cI":5.0}
